@@ -11,15 +11,23 @@ class SolverDFS(UninformedSolver):
         game state leads to more than one unexplored game states,
         explore in the order implied by the GameMaster.getMovables()
         function.
-        If all game states reachable from a parent state has been explored,
+        If all game states rea1chable from a parent state has been explored,
         the next explored state should conform to the specifications of
         the Depth-First Search algorithm.
 
         Returns:
             True if the desired solution state is reached, False otherwise
         """
-        ### Student code goes here
-        return True
+        self.visited[self.currentState] = True
+        if self.currentState == self.victoryCondition: 
+            return True
+
+        moves = self.gm.getMovables
+
+
+
+
+        
 
 
 class SolverBFS(UninformedSolver):
@@ -40,4 +48,8 @@ class SolverBFS(UninformedSolver):
             True if the desired solution state is reached, False otherwise
         """
         ### Student code goes here
-        return True
+        self.visited[self.currentState] = True
+        if self.currentState == self.victoryCondition: 
+            return True
+
+        moves = self.gm.getMovables

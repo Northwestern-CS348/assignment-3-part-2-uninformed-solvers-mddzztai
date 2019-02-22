@@ -4,16 +4,38 @@ write down the Facts and Rules to model the game state
 shown as the follows:
 
  y\\x   pos1     pos2     pos3
-     ----------------------------
-pos1 | tile1  | tile2  | tile3  |
-     ----------------------------
-pos2 | tile8  | empty  | tile4  |
-     ----------------------------
-pos3 | tile7  | tile6  | tile5  |
-     ----------------------------
+     ┌────────┬────────┬────────┐
+pos1 │ tile1  │ tile2  │ tile3  │
+     ├────────┼────────┼────────┤
+pos2 │ tile8  │ empty  │ tile4  │
+     ├────────┼────────┼────────┤
+pos3 │ tile7  │ tile6  │ tile5  │
+     └────────┴────────┴────────┘
 
 Example: 
 fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+fact: (coord tile1 pos1 pos1)
+fact: (coord tile2 pos2 pos1)
+fact: (coord tile3 pos3 pos1)
+fact: (coord tile8 pos1 pos2)
+fact: (coord empty pos2 pos2)
+fact: (coord tile4 pos3 pos2)
+fact: (coord tile7 pos1 pos3)
+fact: (coord tile6 pos2 pos3)
+fact: (coord tile5 pos3 pos3)
+
+fact: (movable tile2 pos2 pos1 pos2 pos2)
+fact: (movable tile8 pos1 pos2 pos2 pos2)
+fact: (movable tile6 pos2 pos3 pos2 pos2)
+fact: (movable tile4 pos3 pos2 pos2 pos2)
+
+rule: ((coord ?t ?posx ?posy) (coord ?t2 ?posx pos2)) -> (adjacent ?t ?t2)
+rule: ((coord ?t ?posx pos2) (coord ?t2 ?posx ?posy)) -> (adjacent ?t ?t2)
+rule: ((coord ?t pos2 ?posy) (coord ?t2 ?posx ?posy)) -> (adjacent ?t ?t2)
+rule: ((coord ?t ?posx ?posy) (coord ?t2 pos2 ?posy)) -> (adjacent ?t ?t2)
+rule: (adjacent ?t ?t2) -> (adjacent ?t ?t2)
+
+rule: ((adjacent ?t empty) (coord empty ?posx1 ?posy1) (coord ?t ?posx2 ?posy2)) -> (movable ?t ?posx2 ?posy2 ?posx1 ?poxy1)
