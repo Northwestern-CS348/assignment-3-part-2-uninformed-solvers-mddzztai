@@ -1,6 +1,6 @@
 """
 For a game where there are 5 disks,
-write down the Facts and Rules to model the game state where 
+write down the Facts and Rules to model the game state where
 all disks are on peg1.
 
         |            |            |
@@ -12,12 +12,21 @@ all disks are on peg1.
    -----|----- disk5 |            |
 ==========================================
        peg1         peg2         peg3
-       
-Example: 
+
+Example:
 fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+fact: (peg peg1)
+fact: (peg peg2)
+fact: (peg peg3)
+
+fact: (disk disk1)
+fact: (disk disk2)
+fact: (disk disk3)
+fact: (disk disk4)
+fact: (disk disk5)
 
 fact: (on disk1 peg1)
 fact: (on disk2 peg1)
@@ -25,26 +34,20 @@ fact: (on disk3 peg1)
 fact: (on disk4 peg1)
 fact: (on disk5 peg1)
 
-fact: (ontopof disk1 disk2)
-fact: (ontopof disk2 disk3)
-fact: (ontopof disk3 disk4)
-fact: (ontopof disk4 disk5)
+fact: (above disk1 disk2)
+fact: (above disk2 disk3)
+fact: (above disk3 disk4)
+fact: (above disk4 disk5)
 
-rule: ((ontopof ?d1 ?d2) (ontopof ?d2 ?d3)) -> (ontopof ?d1 ?d3)
+fact: (top disk1 peg1)
+fact: (empty peg2)
+fact: (empty peg3)
 
 fact: (larger disk5 disk4)
 fact: (larger disk4 disk3)
 fact: (larger disk3 disk2)
 fact: (larger disk2 disk1)
 
-rule: ((larger ?d1 ?d2) (larger ?d2 ?d3)) -> (larger ?d1 ?d3)
-
-fact: (toppeg peg1 disk1)
-fact: (toppeg peg2 none)
-fact: (toppeg peg3 none)
-
-fact: (movable disk1 peg1 peg2)
-fact: (movable disk1 peg1 peg3)
-
-rule: ((toppeg ?p1 ?d1) (toppeg ?p2 none)) -> (movable ?d1 ?p1 ?p2)
-rule: ((toppeg ?p1 ?d1) (toppeg ?p2 ?d2) (larger ?d2 ?d1)) -> (movable ?d1 ?p1 ?p2) 
+rule: ((top ?disk ?pegx) (empty ?pegy) (on ?disk ?pegx)) -> (movable ?disk ?pegx ?pegy)
+rule: ((top ?diskx ?pegx) (top ?disky ?pegy) (larger ?disky ?diskx) (on ?diskx ?pegx)) -> (movable ?diskx ?pegx ?pegy)
+rule: ((larger ?diskx ?disky) (larger ?disky ?diskz)) -> (larger ?diskx ?diskz)

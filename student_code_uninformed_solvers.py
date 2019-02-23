@@ -19,11 +19,51 @@ class SolverDFS(UninformedSolver):
             True if the desired solution state is reached, False otherwise
         """
         self.visited[self.currentState] = True
-        if self.currentState == self.victoryCondition: 
+        if self.gm.getGameState() == self.victoryCondition: 
             return True
 
-        moves = self.gm.getMovables
+        moves = self.gm.getMovables()
+        if moves:
+            visitallstate = True
+            for i in moves:
+                self.gm.makeMove(i)
+                currentGameState = GameState(self.gm.getGameState(), self.currentState.depth + 1, i)
+                
+                if not self.visited.get(currentGameState, False) and not currentGameState in self.currentState.children:
+                    self.currentState.children.append(currentGameState)
+                    currentGameState.parent = self.currentState
+                self.gm.reverseMove(i)
 
+            for child in self.currentState.children:
+                move = child.requiredMovable
+                self.gm.makeMove(move)
+
+                if self.visited.get(child, False):
+                    self.gm.reverseMove(move)
+                    continue
+
+                self.visited[child] = True
+                self.currentState = child
+                visitallstate = False
+                break
+
+            if visitallstate:
+                self.currentState = self.currentState.parent
+                
+            
+            
+            
+        else:
+            self.currentState = self.currentState.parent
+            
+        
+        if self.gm.getGameState() == self.victoryCondition:
+            return True
+
+        return False
+                
+
+        
 
 
 

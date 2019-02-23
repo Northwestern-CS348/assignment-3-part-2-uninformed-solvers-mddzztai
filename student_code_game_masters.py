@@ -72,12 +72,31 @@ class TowerOfHanoiGame(GameMaster):
         """
         
         disk = str(movable_statement.terms[0])
-        xfrom = str(movable_statement.terms[1])
-        xto = str(movable_statement.terms[2])
+        pegfrom = str(movable_statement.terms[1])
+        pegto = str(movable_statement.terms[2])
 
-        self.kb.kb_retract(parse_input('fact: (on '+ disk + ' ' + xfrom + ')' ))
-        self.kb.kb_add(parse_input('fact: (on '+ disk + ' ' + xto +')'))
+        oldmoving = self.kb.kb_ask(parse_input("fact: (above " + disk + " ?d)"))
+        if oldmoving:
+            new_top = oldmoving[0]
+            self.kb.kb_retract(parse_input("fact: (above " + disk + " " + new_top['?d'] + ")"))
+            self.kb.kb_assert(parse_input("fact: (top " + new_top['?d'] + " " + pegfrom + ")"))
+        else:
+            self.kb.kb_assert(parse_input("fact: (empty " + pegfrom + ")"))
+
+        newmoving = self.kb.kb_ask(parse_input("fact: (top " + " ?x" + " " + pegto + ")"))
+        if newmoving:
+            new_top1 = newmoving[0]
+            self.kb.kb_retract(parse_input("fact: (top " + new_top1['?x'] + " " + pegto + ")"))
+            self.kb.kb_assert(parse_input("fact: (above " + disk + " " + new_top1['?x'] + ")"))
+        else:
+            self.kb.kb_retract(parse_input("fact: (empty " + pegto + ")"))
     
+        self.kb.kb_retract(parse_input("fact: (top " + disk + " " + pegfrom + ")"))
+        self.kb.kb_assert(parse_input("fact: (top " + disk + " " + pegto + ")"))
+
+        self.kb.kb_retract(parse_input("fact: (on " + disk + " " + pegfrom + ")"))
+        self.kb.kb_assert(parse_input("fact: (on " + disk + " " + pegto + ")"))
+
     def reverseMove(self, movable_statement):
         """
         See overridden parent class method for more information.
@@ -164,7 +183,9 @@ class Puzzle8Game(GameMaster):
         tox = str(movable_statement.terms[3])
         toy = str(movable_statement.terms[4])
         self.kb.kb_retract(parse_input('fact: (pos ' + tile + ' ' + fromx + ' ' + fromy + ')'))
-        self.kb.kb_add(parse_input('fact: (pos ' + tile + ' ' + tox + ' ' + toy + ')'))
+        self.kb.kb_retract(parse_input('fact: (pos empty ' + tox + ' ' + toy + ')'))
+        self.kb.kb_assert(parse_input('fact: (pos ' + tile + ' ' + tox + ' ' + toy + ')'))
+        self.kb.kb_assert(parse_input('fact: (pos empty ' + fromx + ' ' + fromy + ')'))
 
     def reverseMove(self, movable_statement):
         """
