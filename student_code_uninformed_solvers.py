@@ -89,7 +89,40 @@ class SolverBFS(UninformedSolver):
         """
         ### Student code goes here
         self.visited[self.currentState] = True
-        if self.currentState == self.victoryCondition: 
+        if self.gm.getGameState() == self.victoryCondition: 
             return True
 
-        moves = self.gm.getMovables
+        moves = self.gm.getMovables()
+        curr = self.currentState
+        if moves and not curr.children:
+            for i in moves:
+                self.gm.makeMove(i)
+                newstate = GameState(self.gm.getGameState(), curr.depth + 1, i)
+                newstate.parent = curr
+                curr.children.append(newstate)
+                self.gm.reverseMove(i)
+        self.bfsHelp()
+        return False
+    
+    
+    def bfsHelp(self):
+        while self.currentState.parent and len(self.currentState.parent.children)-1 == self.getIndex(self.currentState):
+            self.gm.reverseMove(self.currentState.requiredMovable)
+            self.currentState = self.currentState.parent
+        if self.currentState.parent:
+            self.gm.reverseMove(self.currentState.requiredMovable)
+            next_index = self.getIndex(self.currentState)+1
+            self.currentState = self.currentState.parent.children[next_index]
+            self.gm.makeMove(self.currentState.requiredMovable)
+        while self.visited.get(self.currentState,False) and self.currentState.children:
+            index = 0
+            self.currentState = self.currentState.children[index]
+            self.gm.makeMove(self.currentState.requiredMovable)
+        if self.visited.get(self.currentState,False):
+            self.bfsHelp()
+        return True
+            
+    def getIndex(self, state):
+        return state.parent.children.index(state)
+
+
